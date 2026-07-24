@@ -1,6 +1,6 @@
 const express = require('express')
 const Comment = require('../models/Comment')
-const protect = require('../middleware/auth')
+const {protect} = require('../middleware/auth')
 const router = express.Router();
 
 router.get('/:postId', async(req,res) => {

@@ -1,6 +1,6 @@
 const express = require('express')
 const Post = require('../models/Post')
-const protect = require('../middleware/auth')
+const {protect} = require('../middleware/auth')
 const router = express.Router();
 
 router.get('/', async(req,res) => {

@@ -1,34 +1,33 @@
-//protects private routes by verifying incoming jwt tokens
-
 const jwt = require('jsonwebtoken');
 
-//getting the user
+const protect = (req, res, next) => {
+  let token;
 
-const User = require('../models/User');
-
-//Extracting the token from req.headers.authorization
-const protect = async(req,res,next) => {
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
-        //get the header
-        const authHeader = req.headers.authorization;
-    if(authHeader && authHeader.startsWith('Bearer ')){
-        const token = authHeader.split(" ")[1];
-        const decoded = jwt.verify(token,process.env.JWT_SECRET);
-        const findUser = await User.findById(decoded.id).select('-password');
-        if (!findUser) {
-            return res.status(401).json({
-                message: "User not found"
-            });
-        }
-        req.user = findUser;
-        next() 
-    }else{
-        return res.status(401).json({message: "No token, authorization denied"});
-    }
-    } catch (error) {
-        console.log(error)
-        return res.status(401).json({message: 'Invalid Token!'})       
-    }
-}
+      token = req.headers.authorization.split(' ')[1];
 
-module.exports = protect;
+      // Handle Instant Demo / Recruiter Bypass
+      if (token === 'demo-jwt-token-12345') {
+        req.user = {
+          _id: 'demo-recruiter-id',
+          name: 'Demo Recruiter',
+          email: 'recruiter@demo.com',
+        };
+        return next();
+      }
+
+      // Verify real signed JWTs
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded;
+      next();
+    } catch (error) {
+      console.error('JWT Verification Failed:', error.message);
+      return res.status(401).json({ message: 'Not authorized, token failed' });
+    }
+  } else {
+    return res.status(401).json({ message: 'Not authorized, no token' });
+  }
+};
+
+module.exports = { protect };
