@@ -10,7 +10,7 @@ const app = express();
 
 //middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000', 'https://devpulse-web-r6zc.onrender.com'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
   }));
